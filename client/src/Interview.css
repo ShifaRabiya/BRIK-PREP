@@ -1,0 +1,168 @@
+.interview-page {
+  height: 100vh;
+  background-color: white;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #296eeb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.interview-container {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+.code-section {
+  width: 50%;
+  padding: 20px;
+  border-right: 2px solid #cdd0d2;
+}
+
+.interaction-section {
+  width: 50%;
+  padding: 20px;
+  position: relative;
+}
+
+/* Camera preview */
+.camera-box {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 160px;
+  height: 120px;
+  border: 2px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #296eeb;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Buttons */
+button {
+  padding: 8px 16px;
+  background-color: #296eeb;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+button:hover {
+  background-color: #1c3aa9;
+}
+
+/* Right panel full height layout */
+.interaction-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Avatar area */
+.avatar-area {
+  flex: 1;
+  border: 2px dashed #296eeb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Avatar container */
+.avatar-wrapper {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  --voice: 0;
+}
+
+/* Circular frame */
+.avatar-wrapper::before {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 3px solid #296eeb;
+  z-index: 1;
+}
+
+/* Human avatar image */
+.avatar-image {
+  width: 140px;
+  height: auto;
+  z-index: 2;
+
+  /* Convert black silhouette to blue */
+  filter: brightness(0) saturate(100%) invert(27%) sepia(93%)
+          saturate(2485%) hue-rotate(216deg)
+          brightness(92%) contrast(95%);
+}
+
+.avatar-wrapper::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(41, 110, 235, 0.35);
+  width: calc(180px + var(--voice) * 160px);
+  height: calc(180px + var(--voice) * 160px);
+  opacity: calc(0.55 - var(--voice) * 0.3);
+  transform: scale(0.9);
+}
+
+/* Animate ONLY when speaking */
+.avatar-wrapper.speaking::after {
+  animation: pulse 1.4s infinite ease-out;
+}
+
+
+/* Pulse animation */
+@keyframes pulse {
+  from {
+    transform: scale(0.85);
+  }
+  to {
+    transform: scale(1.25);
+  }
+}
+
+/* Start button always at bottom */
+.start-button-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 10px;
+}
+
+.start-button-wrapper button {
+  padding: 10px 24px;
+  background-color: #296eeb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.start-button-wrapper button:hover {
+  background-color: #1c3aa9;
+}

@@ -10,7 +10,7 @@ const InterviewSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    resumePath: {
+    resumeText: {
       type: String,
       required: true,
     },

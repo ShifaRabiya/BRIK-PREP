@@ -1,20 +1,14 @@
 const express = require("express");
 const multer = require("multer");
 const Interview = require("../models/Interview");
+const parseResume = require("../utils/resumeParser");
 
 const router = express.Router();
 
-/* ---------- Multer setup ---------- */
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
+/* ---------- Multer MEMORY storage ---------- */
+const upload = multer({
+  storage: multer.memoryStorage(),
 });
-
-const upload = multer({ storage });
 
 /* ---------- POST /api/interview ---------- */
 router.post("/", upload.single("resume"), async (req, res) => {
@@ -25,10 +19,17 @@ router.post("/", upload.single("resume"), async (req, res) => {
       return res.status(400).json({ message: "Resume file required" });
     }
 
+    // 🔥 Parse resume text
+    const resumeText = await parseResume(req.file);
+
+    console.log("===== RESUME TEXT START =====");
+    console.log(resumeText.substring(0, 500)); // preview
+    console.log("===== RESUME TEXT END =====");
+
     const interview = new Interview({
       jobTitle,
       jobDescription,
-      resumePath: req.file.path,
+      resumeText,
     });
 
     await interview.save();

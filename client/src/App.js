@@ -1,15 +1,7 @@
-import logo from './logo.svg';
-import './App.css';
-import InterviewSetup from "./pages/InterviewSetup";
-
+import Interviewp from "./interview/Interviewp";
 
 function App() {
-  return (
-  <div className="App">
-    <InterviewSetup />
-  </div>
-);
-
+  return <Interviewp />;
 }
 
 export default App;

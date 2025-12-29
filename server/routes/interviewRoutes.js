@@ -1,45 +1,51 @@
 const express = require("express");
-const multer = require("multer");
 const Interview = require("../models/Interview");
-const parseResume = require("../utils/resumeParser");
+const crypto = require("crypto");
 
 const router = express.Router();
 
-/* ---------- Multer MEMORY storage ---------- */
-const upload = multer({
-  storage: multer.memoryStorage(),
-});
-
-/* ---------- POST /api/interview ---------- */
-router.post("/", upload.single("resume"), async (req, res) => {
+/* ===============================
+   START INTERVIEW
+   POST /api/interview/start/:sessionId
+================================ */
+router.post("/start/:sessionId", async (req, res) => {
   try {
-    const { jobTitle, jobDescription } = req.body;
+    const { sessionId } = req.params;
+    const { resumeText, jobTitle, jobDescription } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Resume file required" });
+    // Create interview if it doesn't exist
+    let interview = await Interview.findOne({ sessionId });
+    if (!interview) {
+      interview = new Interview({ sessionId, resumeText, jobTitle, jobDescription });
+      await interview.save();
     }
 
-    // 🔥 Parse resume text
-    const resumeText = await parseResume(req.file);
+    // Return first question
+    res.json({ sessionId: interview.sessionId, firstQuestion: "Tell me about yourself" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
-    console.log("===== RESUME TEXT START =====");
-    console.log(resumeText.substring(0, 500)); // preview
-    console.log("===== RESUME TEXT END =====");
+/* ===============================
+   SUBMIT ANSWER
+   POST /api/interview/answer
+================================ */
+router.post("/answer", async (req, res) => {
+  try {
+    const { sessionId, answer } = req.body;
 
-    const interview = new Interview({
-      jobTitle,
-      jobDescription,
-      resumeText,
+    if (!sessionId || !answer) {
+      return res.status(400).json({ message: "Missing data" });
+    }
+
+    // TODO: AI logic later
+    res.json({
+      type: "question",
+      content: "Why do you want to be a frontend developer?",
     });
-
-    await interview.save();
-
-    res.status(201).json({
-      message: "Interview saved successfully",
-      interview,
-    });
-  } catch (error) {
-    console.error("Interview save error:", error);
+  } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 });

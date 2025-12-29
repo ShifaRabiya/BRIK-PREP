@@ -4,37 +4,30 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err.message);
-  });
-
-// Routes
 const interviewRoutes = require("./routes/interviewRoutes");
 const reportRoutes = require("./routes/reportroutes");
 
 const app = express();
 
 app.use(cors());
-app.use(express.json());
 
-// Serve uploaded files
-app.use("/uploads", express.static("uploads"));
+// ↑ Increase request body size limit to handle large resume text
+app.use(express.json({ limit: "5mb" })); // or 10mb if needed
+app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 // Routes
 app.use("/api/interview", interviewRoutes);
 app.use("/api/report", reportRoutes);
 
-// Test root route
 app.get("/", (req, res) => {
-  res.send("BrikPrep backend running (JSON report MVP)");
+  res.send("BrikPrep backend running");
 });
 
-// Start server
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error(err));
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

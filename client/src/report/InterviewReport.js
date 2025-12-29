@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import CircularProgress from "./CircularProgress";
 
@@ -240,20 +240,34 @@ const OverallScoreNumber = styled.div`
   color: #1a1a1a;
 `;
 
-const InterviewReport = ({ userId }) => {
+const InterviewReport = () => {
+  // Remove sessionId for dummy
   const [report, setReport] = useState(null);
 
   useEffect(() => {
-    const fetchReport = async () => {
-      try {
-        const res = await axios.get(`/api/report/${userId}`);
-        setReport(res.data);
-      } catch (err) {
-        console.error(err);
-      }
+    // Dummy report data
+    const dummyReport = {
+      date: new Date().toISOString(),
+      overallScore: 75,
+      technicalKnowledge: {
+        "JavaScript": 65,
+        "React": 70,
+        "CSS": 80,
+      },
+      softSkills: {
+        clarity: 80,
+        strengths: ["Communication", "Teamwork"],
+        weaknesses: ["Time Management"],
+      },
+      generalEvaluation: "Good performance overall, with room for improvement in time management.",
+      motivation: "High motivation and enthusiasm for learning new technologies.",
     };
-    fetchReport();
-  }, [userId]);
+
+    // Simulate API delay
+    setTimeout(() => {
+      setReport(dummyReport);
+    }, 500);
+  }, []);
 
   if (!report) return <p>Loading report...</p>;
 
@@ -261,49 +275,51 @@ const InterviewReport = ({ userId }) => {
 
   return (
     <>
-    <Logo><span><Link href="https://www.brikcommunity.com/">BRIK</Link></span> PREP</Logo>  
-    <Container>
-      <Header>
-        <Title>Interview Report Summary</Title>
-        <InterviewDate>Interview Date: {new Date(date).toLocaleDateString()}</InterviewDate>
-      </Header>
+      <Logo>
+        <span><Link href="https://www.brikcommunity.com/">BRIK</Link></span> PREP
+      </Logo>
+      <Container>
+        <Header>
+          <Title>Interview Report Summary</Title>
+          <InterviewDate>Interview Date: {new Date(date).toLocaleDateString()}</InterviewDate>
+        </Header>
 
-      <MainContent>
-        <LeftSection>
-          <SectionTitle>General Evaluation</SectionTitle>
-          <EvaluationCard>
-            <EvaluationText>{generalEvaluation}</EvaluationText>
-          </EvaluationCard>
+        <MainContent>
+          <LeftSection>
+            <SectionTitle>General Evaluation</SectionTitle>
+            <EvaluationCard>
+              <EvaluationText>{generalEvaluation}</EvaluationText>
+            </EvaluationCard>
 
-          <SectionTitle>Technical Skills</SectionTitle>
-          <SkillsGrid>
-            {Object.entries(technicalKnowledge).map(([skill, score]) => (
-              <SkillCard key={skill}>
-                <SkillTitle>{skill}</SkillTitle>
-                <CircularProgress percentage={score} />
-              </SkillCard>
-            ))}
-          </SkillsGrid>
+            <SectionTitle>Technical Skills</SectionTitle>
+            <SkillsGrid>
+              {Object.entries(technicalKnowledge).map(([skill, score]) => (
+                <SkillCard key={skill}>
+                  <SkillTitle>{skill}</SkillTitle>
+                  <CircularProgress percentage={score} />
+                </SkillCard>
+              ))}
+            </SkillsGrid>
 
-          <SectionTitle>Soft Skills</SectionTitle>
-          <EvaluationCard>
-            <p>Clarity in Speech: {softSkills.clarity}%</p>
-            <p>Strengths: {softSkills.strengths.join(", ")}</p>
-            <p>Weaknesses: {softSkills.weaknesses.join(", ")}</p>
-          </EvaluationCard>
+            <SectionTitle>Soft Skills</SectionTitle>
+            <EvaluationCard>
+              <p>Clarity in Speech: {softSkills.clarity}%</p>
+              <p>Strengths: {softSkills.strengths.join(", ")}</p>
+              <p>Weaknesses: {softSkills.weaknesses.join(", ")}</p>
+            </EvaluationCard>
 
-          <SectionTitle>Motivation</SectionTitle>
-          <EvaluationCard>{motivation}</EvaluationCard>
-        </LeftSection>
+            <SectionTitle>Motivation</SectionTitle>
+            <EvaluationCard>{motivation}</EvaluationCard>
+          </LeftSection>
 
-        <RightSection>
-          <OverallScoreCard>
-            <OverallScoreTitle>Overall Score</OverallScoreTitle>
-            <CircularProgress percentage={overallScore} size={200} />
-          </OverallScoreCard>
-        </RightSection>
-      </MainContent>
-    </Container>
+          <RightSection>
+            <OverallScoreCard>
+              <OverallScoreTitle>Overall Score</OverallScoreTitle>
+              <CircularProgress percentage={overallScore} size={200} />
+            </OverallScoreCard>
+          </RightSection>
+        </MainContent>
+      </Container>
     </>
   );
 };

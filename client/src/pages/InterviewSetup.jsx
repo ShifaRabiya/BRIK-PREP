@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function InterviewSetup() {
+  const navigate = useNavigate();
   const [resume, setResume] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -20,34 +22,23 @@ export default function InterviewSetup() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("resume", resume);
-    formData.append("jobTitle", title);
-    formData.append("jobDescription", description);
+    // read resume as text (simple MVP version)
+    const reader = new FileReader();
 
-    try {
-      setLoading(true);
+    reader.onload = () => {
+      const resumeText = reader.result;
 
-      const response = await fetch("http://localhost:5000/api/interview", {
-        method: "POST",
-        body: formData,
+      navigate("/interview", {
+        state: {
+          sessionId: crypto.randomUUID(),
+          resumeText,
+          jobTitle: title,
+          jobDescription: description,
+        },
       });
+    };
 
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log("Saved:", data);
-        setSubmitted(true);
-        alert("Interview data saved successfully!");
-      } else {
-        alert("Error saving interview data");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Server error");
-    } finally {
-      setLoading(false);
-    }
+    reader.readAsText(resume);
   };
 
   return (

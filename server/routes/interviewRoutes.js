@@ -1,6 +1,7 @@
 const express = require("express");
 const Interview = require("../models/Interview");
 const crypto = require("crypto");
+const { generateQuestion } = require("../utils/aiInterview");
 
 const router = express.Router();
 
@@ -16,12 +17,26 @@ router.post("/start/:sessionId", async (req, res) => {
     // Create interview if it doesn't exist
     let interview = await Interview.findOne({ sessionId });
     if (!interview) {
-      interview = new Interview({ sessionId, resumeText, jobTitle, jobDescription });
+      interview = new Interview({
+        sessionId,
+        resumeText,
+        jobTitle,
+        jobDescription,
+      });
       await interview.save();
     }
 
-    // Return first question
-    res.json({ sessionId: interview.sessionId, firstQuestion: "Tell me about yourself" });
+    // 🤖 Generate first AI question
+    const firstQuestion = await generateQuestion({
+      jobTitle,
+      jobDescription,
+      resumeText,
+    });
+
+    res.json({
+      sessionId: interview.sessionId,
+      firstQuestion,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -40,12 +55,26 @@ router.post("/answer", async (req, res) => {
       return res.status(400).json({ message: "Missing data" });
     }
 
-    // TODO: AI logic later
+    const interview = await Interview.findOne({ sessionId });
+
+    if (!interview) {
+      return res.status(404).json({ message: "Interview not found" });
+    }
+
+    // 🤖 Generate next AI question
+    const nextQuestion = await generateQuestion({
+      jobTitle: interview.jobTitle,
+      jobDescription: interview.jobDescription,
+      resumeText: interview.resumeText,
+      previousAnswer: answer,
+    });
+
     res.json({
       type: "question",
-      content: "Why do you want to be a frontend developer?",
+      content: nextQuestion,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
